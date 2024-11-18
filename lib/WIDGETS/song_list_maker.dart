@@ -145,12 +145,14 @@ class SongDisplay extends StatelessWidget {
                   );
                 }
 
-                MozController.player.setAudioSource(
-                    await MozController.createSongList(songs),
-                    initialIndex: index);
                 // MostlyPlayedDB.incrementPlayCount(song);
-                MozController.player.play();
-                MozController.playingSongs = songs;
+                if (!isSelecting) {
+                  MozController.player.setAudioSource(
+                      await MozController.createSongList(songs),
+                      initialIndex: index);
+                  MozController.player.play();
+                  MozController.playingSongs = songs;
+                }
               }
             },
       trailing:

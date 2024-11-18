@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:music_player/CONSTANTS/asset_helper.dart';
 import 'package:music_player/PROVIDER/theme_class_provider.dart';
+import 'package:music_player/WIDGETS/svg_helper.dart';
 import 'package:provider/provider.dart';
 import '../../COLORS/colors.dart';
 
@@ -41,6 +43,7 @@ class _ChangeThemeButtonWidgetState extends State<ChangeThemeButtonWidget> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final darkTheme = (themeProvider.getTheme() == CustomThemes.lightThemeMode);
+    final Size size = MediaQuery.sizeOf(context);
     if (widget.changeICon) {
       return Switch(
         value: darkTheme,
@@ -53,12 +56,21 @@ class _ChangeThemeButtonWidgetState extends State<ChangeThemeButtonWidget> {
         // inactiveTrackColor: Colors.grey[700],
       );
     } else {
-      return IconButton(
-        icon: Icon(
-          darkTheme ? Icons.dark_mode : Icons.light_mode,
+      // return IconButton(
+      //   icon: Icon(
+      //     darkTheme ? Icons.dark_mode : Icons.light_mode,
+      //     color: darkTheme ? Colors.black : Colors.white,
+      //   ),
+      //   onPressed: () => _toggleTheme(themeProvider),
+      // );
+      return InkWell(
+        onTap: () => _toggleTheme(themeProvider),
+        child: SetSvg(
+          name: !darkTheme ? GetAsset.light :GetAsset.dark,
           color: darkTheme ? Colors.black : Colors.white,
+          width: size.width * .07,
+          height: size.height * .03,
         ),
-        onPressed: () => _toggleTheme(themeProvider),
       );
     }
   }

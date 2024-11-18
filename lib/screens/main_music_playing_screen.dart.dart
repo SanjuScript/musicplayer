@@ -2,8 +2,10 @@ import 'dart:developer';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:music_player/CONSTANTS/asset_helper.dart';
 import 'package:music_player/CONTROLLER/song_controllers.dart';
 import 'package:music_player/DATABASE/favorite_db.dart';
 import 'package:music_player/HELPER/artist_helper.dart';
@@ -11,6 +13,7 @@ import 'package:music_player/PROVIDER/color_extraction.dart';
 import 'package:music_player/PROVIDER/now_playing_provider.dart';
 import 'package:music_player/PROVIDER/theme_class_provider.dart';
 import 'package:music_player/WIDGETS/audio_artwork_definer.dart';
+import 'package:music_player/WIDGETS/audio_for_others.dart';
 import 'package:music_player/WIDGETS/bouncing_widget.dart';
 import 'package:music_player/WIDGETS/buttons/home_button.dart';
 import 'package:music_player/WIDGETS/buttons/play_pause_button.dart';
@@ -20,6 +23,7 @@ import 'package:music_player/WIDGETS/buttons/theme_button_widget.dart';
 import 'package:music_player/WIDGETS/custom_slider.dart';
 import 'package:music_player/WIDGETS/dialogues/UTILS/dialogue_utils.dart';
 import 'package:music_player/WIDGETS/dialogues/playlist_easy_access.dart';
+import 'package:music_player/WIDGETS/svg_helper.dart';
 import 'package:music_player/screens/favoritepage/favorite_music_playing.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
@@ -69,8 +73,7 @@ class _NowPlayingState extends State<NowPlaying>
   Widget build(BuildContext context) {
     log('Main music player rebuilds');
     super.build(context);
-    final ht = MediaQuery.of(context).size.height;
-    final wt = MediaQuery.of(context).size.width;
+    final size = MediaQuery.sizeOf(context);
     final artworkColor =
         Provider.of<ArtworkColorProvider>(context).dominantColor;
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -126,7 +129,7 @@ class _NowPlayingState extends State<NowPlaying>
                 children: <Widget>[
                   Padding(
                     padding: EdgeInsets.symmetric(
-                      vertical: ht * 0.05,
+                      vertical: size.height * 0.05,
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.max,
@@ -141,7 +144,7 @@ class _NowPlayingState extends State<NowPlaying>
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: 'hando',
-                            fontSize: wt * 0.04,
+                            fontSize: size.width * 0.04,
                             letterSpacing: 3.6,
                             // color: const Color(0xff333c67),
                             color: Theme.of(context)
@@ -156,8 +159,8 @@ class _NowPlayingState extends State<NowPlaying>
                   AnimatedContainer(
                     duration: Duration(milliseconds: 500),
                     padding: const EdgeInsets.all(3),
-                    width: wt * 0.87,
-                    height: ht * 0.38,
+                    width: size.width * 0.87,
+                    height: size.height * 0.38,
                     decoration: BoxDecoration(
                       color: Colors.transparent,
                       borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -166,9 +169,8 @@ class _NowPlayingState extends State<NowPlaying>
                               BoxShadow(
                                 color: artworkColor!.withOpacity(.8),
                                 blurRadius: 20,
-                          
                                 spreadRadius: 1,
-                                offset:const Offset(0, 10),
+                                offset: const Offset(0, 10),
                               ),
                             ]
                           : [],
@@ -178,23 +180,26 @@ class _NowPlayingState extends State<NowPlaying>
                         return BouncableEffect(
                           onDoubletap: true,
                           songModel: widget.songModelList[value.currentIndex],
-                          child: AudioArtworkDefiner(
-                            id: widget.songModelList[value.currentIndex].id,
-                            size: 500,
-                            // enableAnimation: true,
+                          child: Hero(
+                            tag: widget.songModelList[value.currentIndex].id,
+                            child: AudioArtworkDefiner(
+                              id: widget.songModelList[value.currentIndex].id,
+                              size: 500,
+                              // enableAnimation: true,
 
-                            imgRadius: 15,
+                              imgRadius: 15,
+                            ),
                           ),
                         );
                       },
                     ),
                   ),
                   SizedBox(
-                    height: ht * 0.02,
+                    height: size.height * 0.02,
                   ),
                   SizedBox(
-                    height: ht * 0.04,
-                    width: wt * 0.7,
+                    height: size.height * 0.04,
+                    width: size.width * 0.7,
                     child: Consumer<NowPlayingProvider>(
                       builder: (context, value, child) {
                         return Text(
@@ -202,7 +207,7 @@ class _NowPlayingState extends State<NowPlaying>
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               fontFamily: 'rounder',
-                              fontSize: ht * 0.03,
+                              fontSize: size.height * 0.03,
                               letterSpacing: .5,
                               overflow: TextOverflow.ellipsis,
                               fontWeight: FontWeight.w200,
@@ -213,8 +218,8 @@ class _NowPlayingState extends State<NowPlaying>
                   ),
 
                   SizedBox(
-                    width: wt * 0.8,
-                    height: ht * 0.02,
+                    width: size.width * 0.8,
+                    height: size.height * 0.02,
                     child: Consumer<NowPlayingProvider>(
                       builder: (context, value, child) {
                         return Text(
@@ -226,7 +231,7 @@ class _NowPlayingState extends State<NowPlaying>
                           maxLines: 1,
                           style: TextStyle(
                               fontFamily: 'rounder',
-                              fontSize: ht * 0.0165,
+                              fontSize: size.height * 0.0165,
                               overflow: TextOverflow.ellipsis,
                               fontWeight: FontWeight.normal,
                               color: Theme.of(context)
@@ -240,14 +245,14 @@ class _NowPlayingState extends State<NowPlaying>
                   // Progress Bar Here
                   Padding(
                     padding: EdgeInsets.only(
-                      top: ht * 0.03,
-                      bottom: ht * 0.01,
-                      left: wt * 0.01,
-                      right: wt * 0.01,
+                      top: size.height * 0.03,
+                      bottom: size.height * 0.01,
+                      left: size.width * 0.01,
+                      right: size.width * 0.01,
                     ),
                     child: SizedBox(
-                      width: wt * 0.9,
-                      height: ht * 0.060,
+                      width: size.width * 0.9,
+                      height: size.height * 0.060,
                       child: Consumer<NowPlayingProvider>(
                         builder: (context, value, child) {
                           return MozSlider(
@@ -267,11 +272,11 @@ class _NowPlayingState extends State<NowPlaying>
                   ),
 
                   SizedBox(
-                    height: ht * 0.02,
+                    height: size.height * 0.02,
                   ),
 
                   SizedBox(
-                      height: ht * 0.11,
+                      height: size.height * 0.11,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -294,7 +299,7 @@ class _NowPlayingState extends State<NowPlaying>
                                 },
                                 child: Icon(
                                   Icons.more_vert_rounded,
-                                  size: wt * 0.07,
+                                  size: size.width * 0.07,
                                   color: const Color(0xff9CADC0),
                                 ));
                           }),
@@ -302,8 +307,8 @@ class _NowPlayingState extends State<NowPlaying>
                           StreamBuilder<LoopMode>(
                             stream: MozController.player.loopModeStream,
                             builder: (context, snapshot) {
-                              return repeatButton(
-                                  context, snapshot.data ?? LoopMode.off, wt);
+                              return repeatButton(context,
+                                  snapshot.data ?? LoopMode.off, size.width);
                             },
                           ),
 
@@ -316,23 +321,23 @@ class _NowPlayingState extends State<NowPlaying>
                           ),
 
                           InkWell(
-                            radius: 50,
-                            overlayColor:
-                                WidgetStateProperty.all(Colors.transparent),
-                            onTap: () {
-                              DialogueUtils.getDialogue(context, 'speed',
-                                  arguments: isDark
-                                      ? Colors.transparent
-                                      : Colors.black.withOpacity(.3));
-                            },
-                            child: Icon(
-                              Icons.speed,
-                              size: wt * 0.07,
-                              color: MozController.player.speed != 1.0
-                                  ? Colors.deepPurple[400]
-                                  : const Color(0xff9CADC0),
-                            ),
-                          ),
+                              radius: 50,
+                              overlayColor:
+                                  WidgetStateProperty.all(Colors.transparent),
+                              onTap: () {
+                                DialogueUtils.getDialogue(context, 'speed',
+                                    arguments: isDark
+                                        ? Colors.transparent
+                                        : Colors.black.withOpacity(.3));
+                              },
+                              child: SetSvg(
+                                name: GetAsset.speed,
+                                width: size.width * .07,
+                                height: size.height * .03,
+                                color: MozController.player.speed != 1.0
+                                    ? Colors.deepPurple[400]!
+                                    : const Color(0xff9CADC0),
+                              )),
                         ],
                       )),
                   Padding(
@@ -345,7 +350,8 @@ class _NowPlayingState extends State<NowPlaying>
                           stream: MozController.player.shuffleModeEnabledStream,
                           builder: (context, snapshot) {
                             bool isEnabled = snapshot.data ?? false;
-                            return shuffleButton(context, isEnabled, wt);
+                            return shuffleButton(
+                                context, isEnabled, size.width);
                           },
                         ),
 
@@ -356,17 +362,17 @@ class _NowPlayingState extends State<NowPlaying>
                                 .read<NowPlayingProvider>()
                                 .previousButtonHere();
                           },
-                          FontAwesomeIcons.backward,
+                          GetAsset.previous,
                         ),
 
                         StreamBuilder<PlayerState>(
                           stream: MozController.player.playerStateStream,
                           builder: (_, snapshot) {
                             return SizedBox(
-                                height: ht * 0.13,
-                                width: wt * 0.13,
+                                height: size.height * 0.13,
+                                width: size.width * 0.13,
                                 child: playPauseButton(
-                                    context, MozController.player.playing, wt));
+                                    context, MozController.player.playing, size,isDark));
                           },
                         ),
 
@@ -375,9 +381,9 @@ class _NowPlayingState extends State<NowPlaying>
                           () async {
                             context.read<NowPlayingProvider>().nextButtonHere();
                           },
-                          FontAwesomeIcons.forward,
+                          GetAsset.next,
                         ),
-                        homeButton(context, wt),
+                        homeButton(context, size.width),
                       ],
                     ),
                   )

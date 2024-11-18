@@ -5,6 +5,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:flutter/services.dart';
+import 'package:music_player/ANIMATION/up_animation.dart';
 import 'package:music_player/DATABASE/favorite_db.dart';
 import 'package:music_player/DATABASE/playlistDb.dart';
 import 'package:music_player/DATABASE/recently_played.dart';
@@ -136,6 +137,14 @@ class MyApp extends StatelessWidget {
             '/about': (context) => const AboutPage(),
             '/privacyPage': (context) => const PrivacyPolicyPage(),
           },
+            onGenerateRoute: (settings) {
+        if (settings.name == '/playlistSongList') {
+          return Uptransition(const PlayListSongListScreen()); 
+        } else if (settings.name == '/playlistsong') {
+          return Uptransition(const PlaylistSongDisplayScreen()); 
+        }
+        return null;
+      },
         );
       },
     );

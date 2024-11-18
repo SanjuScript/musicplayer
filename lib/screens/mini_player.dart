@@ -72,13 +72,19 @@ class MiniPlayer extends StatelessWidget {
                                 child: Nuemorphic(
                                   borderRadius: BorderRadius.circular(100),
                                   shadowVisibility: false,
-                                  child: AudioArtworkDefinerForOthers(
-                                    iconSize: 25,
-                                    id: MozController
+                                  child: Hero(
+                                    tag: MozController
                                         .playingSongs[
                                             MozController.player.currentIndex!]
                                         .id,
-                                    imgRadius: 8,
+                                    child: AudioArtworkDefinerForOthers(
+                                      iconSize: 25,
+                                      id: MozController
+                                          .playingSongs[MozController
+                                              .player.currentIndex!]
+                                          .id,
+                                      imgRadius: 8,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -90,8 +96,7 @@ class MiniPlayer extends StatelessWidget {
                             MozController
                                 .playingSongs[
                                     MozController.player.currentIndex!]
-                                .title
-                                ,
+                                .title,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(

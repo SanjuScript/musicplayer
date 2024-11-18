@@ -69,7 +69,7 @@ class _SongInfoState extends State<SongInfo> {
                   height: size.height * .07,
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     horizontal: 20,
                   ),
                   child: Align(
@@ -98,13 +98,16 @@ class _SongInfoState extends State<SongInfo> {
                 SizedBox(
                   width: size.width * 0.87,
                   height: size.height * 0.38,
-                  child: AudioArtworkDefinerForOthers(
-                    size: 500,
-                    id: songData.id,
-                    imgRadius: 10,
+                  child: Hero(
+                    tag: songData.id,
+                    child: AudioArtworkDefinerForOthers(
+                      size: 500,
+                      id: songData.id,
+                      imgRadius: 10,
+                    ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Padding(
