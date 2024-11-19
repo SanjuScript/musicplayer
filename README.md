@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Moz Music 🎶  
 Welcome to **Moz Music**, your ultimate music player experience built using Flutter. Stream your favorite tracks with a sleek design, dynamic themes, and advanced playback features.
 
@@ -52,3 +53,6 @@ For support or inquiries, feel free to reach out at:
 ---
 
 **Moz Music** – because every beat matters 🎧.
+=======
+# musicplayer
+>>>>>>> dcfabd37b390872899e5685be11d8e9d7dadcbbe
