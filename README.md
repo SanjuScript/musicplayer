@@ -48,7 +48,7 @@ You may use this code for learning purposes, but please refrain from copying or 
 
 ## 🌐 Connect  
 For support or inquiries, feel free to reach out at:  
-**Email**: [mozmusicfounder@gmail.com](mailto:dev.sanju.codes@gmail.com)
+**Email**: [dev.sanju.code@gmail.com](mailto:dev.sanju.codes@gmail.com)
 
 ---
 
