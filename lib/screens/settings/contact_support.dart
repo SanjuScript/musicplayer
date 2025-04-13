@@ -57,7 +57,7 @@ class ContactSupportPage extends StatelessWidget {
                 child: ListTile(
                   leading: Icon(Icons.email, color: Colors.deepPurple),
                   title: Text('Email:'),
-                  subtitle: Text('mozmusicfounder@gmail.com'),
+                  subtitle: Text('npsanjay246@gmail.com'),
                   
                   trailing: Icon(Icons.arrow_forward_ios, color: Colors.grey),
                 ),

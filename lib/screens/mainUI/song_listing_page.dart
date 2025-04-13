@@ -3,8 +3,12 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
+import 'package:music_player/CONSTANTS/asset_helper.dart';
+import 'package:music_player/CONTROLLER/handler.dart';
 import 'package:music_player/DATABASE/favorite_db.dart';
+import 'package:music_player/DATABASE/remove_songs_db.dart';
 import 'package:music_player/PROVIDER/homepage_provider.dart';
 import 'package:music_player/PROVIDER/remove_song_provider.dart';
 import 'package:music_player/WIDGETS/custom_slider.dart';
@@ -111,14 +115,18 @@ class _SongListingPageState extends State<SongListingPage>
                     ),
                   ),
                   leading: InkWell(
-                    onTap: () {
-                      scaffoldKey.currentState?.openDrawer();
-                    },
-                    child: Icon(
-                      Icons.menu,
-                      color: Theme.of(context).cardColor,
-                    ),
-                  ),
+                      onTap: () {
+                        scaffoldKey.currentState?.openDrawer();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: SvgPicture.asset(
+                          width: 10,
+                          GetAsset.menu,
+                          colorFilter: ColorFilter.mode(
+                              Theme.of(context).cardColor, BlendMode.srcIn),
+                        ),
+                      )),
                   actions: [
                     IconButton(
                       onPressed: () {
@@ -128,12 +136,12 @@ class _SongListingPageState extends State<SongListingPage>
                         );
                       },
                       icon: Transform.scale(
-                        scale: MediaQuery.of(context).size.width * 0.003,
-                        child: Icon(
-                          Icons.search,
-                          color: Theme.of(context).cardColor,
-                        ),
-                      ),
+                          scale: MediaQuery.of(context).size.width * 0.003,
+                          child: SvgPicture.asset(
+                            GetAsset.search,
+                            colorFilter: ColorFilter.mode(
+                                Theme.of(context).cardColor, BlendMode.srcIn),
+                          )),
                       splashColor: Colors.transparent,
                     ),
                     if (removeSongList.isSelect)
@@ -161,11 +169,10 @@ class _SongListingPageState extends State<SongListingPage>
                       color: Theme.of(context).splashColor,
                       onSelected: (value) {
                         if (value == 'sort') {
-                          showModalBottomSheet<void>(
-                            backgroundColor: Colors.transparent,
+                          showDialog<void>(
                             context: context,
-                            builder: (context) {
-                              return SortOptionBottomSheet(
+                            builder: (BuildContext context) {
+                              return SortOptionDialog(
                                 selectedOption: homepageState.defaultSort,
                                 onSelected: (value) {
                                   homepageState.toggleValue(value);
@@ -256,6 +263,7 @@ class _SongListingPageState extends State<SongListingPage>
                       );
                     } else {
                       startSong = snapshot.data!;
+
                       MozController.songscopy =
                           sortSongs(snapshot.data!, homepageState.defaultSort);
 
@@ -264,6 +272,8 @@ class _SongListingPageState extends State<SongListingPage>
                         FavoriteDb.intialize(snapshot.data!);
                         RecentDb.initialize(snapshot.data!);
                       }
+
+                      log("Removes : ${RemovedSongsDB.removedSongsList.length}");
 
                       // if (!RecentlyPlayedDB.isInitialized) {
                       //   RecentlyPlayedDB.intialize(snapshot.data!);

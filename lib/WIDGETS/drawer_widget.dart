@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:music_player/SCREENS/settings/about.dart';
 import 'package:music_player/Widgets/buttons/theme_button_widget.dart';
+import 'package:music_player/screens/settings/about.dart';
+import 'package:music_player/screens/settings/privacy_policy.dart';
+import 'package:music_player/screens/settings/setting_page.dart';
 import 'package:provider/provider.dart';
 import '../ANIMATION/slide_animation.dart';
 import '../COLORS/colors.dart';
 import '../DATABASE/most_played.dart';
 import '../PROVIDER/theme_class_provider.dart';
 import '../SCREENS/playlist/playlist_screen.dart';
-// import '../screens/about.dart';
 import '../SCREENS/favoritepage/favoriteSongLists.dart';
-import '../SCREENS/settings/privacy_policy.dart';
 import '../SCREENS/search_music_screen.dart';
-import '../SCREENS/settings/setting.dart';
 import 'bottomsheet/sleep_timer_sheet.dart';
 
 Widget drawerWidget(
@@ -25,16 +24,13 @@ Widget drawerWidget(
           Container(
             height: 150,
             width: MediaQuery.of(context).size.width,
-            color: Colors.deepPurple[400],
-            child: const Center(
-              child: Text(
-                'M o z  M u s i c ',
-                style: TextStyle(
-                  color: Color.fromARGB(255, 228, 229, 229),
-                  fontFamily: 'optica',
-                ),
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/logo.jpg'),
+                fit: BoxFit.cover,
               ),
             ),
+            
           ),
           Expanded(
             child: ListView(
@@ -132,7 +128,7 @@ Widget listDrawerItems(
       text,
       style: TextStyle(
           color: Theme.of(context).cardColor,
-          fontFamily: 'optica',
+          fontFamily: 'monuse',
           fontWeight: FontWeight.w400),
     ),
     trailing: isTrailingVisible ? ChangeThemeButtonWidget() : trailingIcon,

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:music_player/HELPER/artist_helper.dart';
@@ -104,6 +103,7 @@ class SongDisplay extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
       ),
+      
       onLongPress: () async {
         bottomDetailsSheet(
           context: context,
@@ -111,7 +111,12 @@ class SongDisplay extends StatelessWidget {
           remove: remove,
           song: songs,
           index: index,
-          onTap: () {},
+          showNext: true,
+          isPlaylistShown: false,
+          onTap: () {
+            MozController.addToNext(song);
+            Navigator.pop(context);
+          },
         );
         // await DataController.deleteImageFile(File(song.data));
       },
@@ -151,12 +156,95 @@ class SongDisplay extends StatelessWidget {
                       await MozController.createSongList(songs),
                       initialIndex: index);
                   MozController.player.play();
-                  MozController.playingSongs = songs;
+                  // MozController.playingSongs = songs;
                 }
               }
             },
       trailing:
           isTrailingChange ? trailing : FavoriteButton(songFavorite: song),
+    );
+  }
+}
+
+class NextQueueScreen extends StatefulWidget {
+  const NextQueueScreen({Key? key}) : super(key: key);
+
+  @override
+  State<NextQueueScreen> createState() => _NextQueueScreenState();
+}
+
+class _NextQueueScreenState extends State<NextQueueScreen> {
+  late List<SongModel> upcomingSongs;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateUpcoming();
+  }
+
+  void _updateUpcoming() {
+    if (MozController.currentIndex < MozController.playingSongs.length - 1) {
+      upcomingSongs = MozController.playingSongs.sublist(MozController.currentIndex + 1);
+    } else {
+      upcomingSongs = [];
+    }
+  }
+
+  void _removeFromQueue(int index) {
+    int actualIndex = MozController.currentIndex + 1 + index;
+
+    MozController.playingSongs.removeAt(actualIndex);
+    MozController.currentPlaylist.removeAt(actualIndex);
+
+    setState(() {
+      _updateUpcoming();
+    });
+  }
+
+  void _reorderQueue(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) newIndex--;
+
+    int actualOld = MozController.currentIndex + 1 + oldIndex;
+    int actualNew = MozController.currentIndex + 1 + newIndex;
+
+    final song = MozController.playingSongs.removeAt(actualOld);
+    final source = MozController.currentPlaylist.children.removeAt(actualOld);
+
+    MozController.playingSongs.insert(actualNew, song);
+    MozController.currentPlaylist.insert(actualNew, source);
+
+    setState(() {
+      _updateUpcoming();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Next Up")),
+      body: upcomingSongs.isEmpty
+          ? const Center(child: Text("No songs in queue"))
+          : ReorderableListView.builder(
+              itemCount: upcomingSongs.length,
+              onReorder: _reorderQueue,
+              itemBuilder: (context, index) {
+                final song = upcomingSongs[index];
+                return ListTile(
+                  key: ValueKey(song.id),
+                  leading: QueryArtworkWidget(
+                    id: song.id,
+                    type: ArtworkType.AUDIO,
+                    nullArtworkWidget: const Icon(Icons.music_note),
+                  ),
+                  title: Text(song.title),
+                  subtitle: Text(song.artist ?? ''),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () => _removeFromQueue(index),
+                  ),
+                );
+              },
+            ),
     );
   }
 }

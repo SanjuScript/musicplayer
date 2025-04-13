@@ -8,12 +8,16 @@ import 'package:music_player/EXTENSION/capitalizer.dart';
 class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
   ThemeData _themeData = CustomThemes.lightThemeMode;
   String _themeMode = 'light';
+  bool _isTimeBasedModeEnabled = false;
 
+  String get currentTheme => _themeMode;
   ThemeData getTheme() => _themeData;
-
+  bool isTimeBased() => _isTimeBasedModeEnabled;
   String getDisplayThemeMode() {
     if (_themeMode == 'system') {
       return 'System Default';
+    } else if (_themeMode == 'timeBased') {
+      return 'Time-Based';
     } else {
       return _themeMode.capitalize();
     }
@@ -21,9 +25,9 @@ class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   ThemeProvider() {
     WidgetsBinding.instance.addObserver(this);
-
     MozStorageManager.readData('themeMode').then((value) {
       _themeMode = value ?? 'light';
+      _isTimeBasedModeEnabled = value == 'timeBased';
       _setThemeMode(_themeMode);
     });
   }
@@ -44,6 +48,8 @@ class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
       _themeData = brightness == Brightness.dark
           ? CustomThemes.darkThemeMode
           : CustomThemes.lightThemeMode;
+    } else if (themeMode == 'timeBased') {
+      _setTimeBasedMode();
     }
 
     _themeMode = themeMode;
@@ -72,6 +78,31 @@ class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
     _themeMode = 'system';
     MozStorageManager.saveData('themeMode', 'system');
     notifyListeners();
+  }
+
+  void setTimeBasedMode(bool enabled) async {
+    _isTimeBasedModeEnabled = enabled;
+    if (enabled) {
+      _themeMode = 'timeBased';
+      _setTimeBasedMode();
+    } else {
+      _themeMode = 'light'; // Default to light mode if disabled
+      _themeData = CustomThemes.lightThemeMode;
+    }
+    MozStorageManager.saveData('themeMode', _themeMode);
+    notifyListeners();
+  }
+
+  void _setTimeBasedMode() {
+    final currentTime = DateTime.now();
+    final hour = currentTime.hour;
+
+    // Set theme based on time (6 AM to 6 PM = light mode, else dark mode)
+    if (hour >= 6 && hour < 18) {
+      _themeData = CustomThemes.lightThemeMode;
+    } else {
+      _themeData = CustomThemes.darkThemeMode;
+    }
   }
 
   @override

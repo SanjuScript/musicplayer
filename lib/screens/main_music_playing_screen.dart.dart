@@ -124,271 +124,268 @@ class _NowPlayingState extends State<NowPlaying>
             ),
             height: MediaQuery.sizeOf(context).height,
             width: MediaQuery.sizeOf(context).width,
-            child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      vertical: size.height * 0.05,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        const Icon(
-                          Icons.abc,
-                          color: Colors.transparent,
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: size.height * 0.05, bottom: size.height * 0.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      const Icon(
+                        Icons.abc,
+                        color: Colors.transparent,
+                      ),
+
+                      Text(
+                        "PLAYING NOW",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'hando',
+                          fontSize: size.width * 0.04,
+                          letterSpacing: 3.6,
+                          // color: const Color(0xff333c67),
+                          color: Theme.of(context)
+                              .unselectedWidgetColor
+                              .withOpacity(.7),
                         ),
-                        Text(
-                          "PLAYING NOW",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontFamily: 'hando',
-                            fontSize: size.width * 0.04,
-                            letterSpacing: 3.6,
-                            // color: const Color(0xff333c67),
+                      ),
+                      const ChangeThemeButtonWidget(),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+                AnimatedContainer(
+                  duration: const Duration(seconds: 1),
+                  padding: const EdgeInsets.all(3),
+                  width: size.width * 0.87,
+                  height: size.height * 0.38,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.all(Radius.circular(15)),
+                    boxShadow: !isDark
+                        ? [
+                            BoxShadow(
+                              color: artworkColor!.withOpacity(.8),
+                              blurRadius: 20,
+                              spreadRadius: 1,
+                              offset: const Offset(0, 10),
+                            ),
+                          ]
+                        : [],
+                  ),
+                  child: Consumer<NowPlayingProvider>(
+                    builder: (context, value, child) {
+                      return BouncableEffect(
+                        onDoubletap: true,
+                        songModel: widget.songModelList[value.currentIndex],
+                        child: Hero(
+                          tag: widget.songModelList[value.currentIndex].id,
+                          child: AudioArtworkDefiner(
+                            id: widget.songModelList[value.currentIndex].id,
+                            size: 500,
+                            // enableAnimation: true,
+
+                            imgRadius: 20,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(
+                  height: size.height * 0.02,
+                ),
+                SizedBox(
+                  height: size.height * 0.04,
+                  width: size.width * 0.7,
+                  child: Consumer<NowPlayingProvider>(
+                    builder: (context, value, child) {
+                      return Text(
+                        widget.songModelList[value.currentIndex].title,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontFamily: 'rounder',
+                            fontSize: size.height * 0.03,
+                            letterSpacing: .5,
+                            overflow: TextOverflow.ellipsis,
+                            fontWeight: FontWeight.w200,
+                            color: Theme.of(context).hintColor),
+                      );
+                    },
+                  ),
+                ),
+
+                SizedBox(
+                  width: size.width * 0.8,
+                  height: size.height * 0.02,
+                  child: Consumer<NowPlayingProvider>(
+                    builder: (context, value, child) {
+                      return Text(
+                        artistHelper(
+                            widget.songModelList[value.currentIndex].artist
+                                .toString(),
+                            ''),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        style: TextStyle(
+                            fontFamily: 'rounder',
+                            fontSize: size.height * 0.0165,
+                            overflow: TextOverflow.ellipsis,
+                            fontWeight: FontWeight.normal,
                             color: Theme.of(context)
                                 .unselectedWidgetColor
-                                .withOpacity(.7),
-                          ),
-                        ),
-                        const ChangeThemeButtonWidget(),
-                      ],
-                    ),
+                                .withOpacity(.5)),
+                      );
+                    },
                   ),
-                  AnimatedContainer(
-                    duration: Duration(milliseconds: 500),
-                    padding: const EdgeInsets.all(3),
-                    width: size.width * 0.87,
-                    height: size.height * 0.38,
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.all(Radius.circular(15)),
-                      boxShadow: !isDark
-                          ? [
-                              BoxShadow(
-                                color: artworkColor!.withOpacity(.8),
-                                blurRadius: 20,
-                                spreadRadius: 1,
-                                offset: const Offset(0, 10),
-                              ),
-                            ]
-                          : [],
-                    ),
+                ),
+
+                // Progress Bar Here
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: size.height * 0.03,
+                    bottom: size.height * 0.01,
+                    left: size.width * 0.01,
+                    right: size.width * 0.01,
+                  ),
+                  child: SizedBox(
+                    width: size.width * 0.9,
+                    height: size.height * 0.060,
                     child: Consumer<NowPlayingProvider>(
                       builder: (context, value, child) {
-                        return BouncableEffect(
-                          onDoubletap: true,
-                          songModel: widget.songModelList[value.currentIndex],
-                          child: Hero(
-                            tag: widget.songModelList[value.currentIndex].id,
-                            child: AudioArtworkDefiner(
-                              id: widget.songModelList[value.currentIndex].id,
-                              size: 500,
-                              // enableAnimation: true,
-
-                              imgRadius: 15,
-                            ),
-                          ),
-                        );
+                        return MozSlider(
+                            currentPosition: value.position,
+                            totalDuration: value.duration,
+                            onChanged: (newValue) {
+                              value.changeToSeconds(
+                                  newValue * value.duration.inSeconds);
+                            },
+                            sliderColor: Colors.deepPurple[400]!,
+                            thumbColor: Colors.deepPurple[400]!,
+                            backgroundColor:
+                                Colors.deepPurple[400]!.withOpacity(.1));
                       },
                     ),
                   ),
-                  SizedBox(
-                    height: size.height * 0.02,
-                  ),
-                  SizedBox(
-                    height: size.height * 0.04,
-                    width: size.width * 0.7,
-                    child: Consumer<NowPlayingProvider>(
-                      builder: (context, value, child) {
-                        return Text(
-                          widget.songModelList[value.currentIndex].title,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontFamily: 'rounder',
-                              fontSize: size.height * 0.03,
-                              letterSpacing: .5,
-                              overflow: TextOverflow.ellipsis,
-                              fontWeight: FontWeight.w200,
-                              color: Theme.of(context).hintColor),
-                        );
-                      },
-                    ),
-                  ),
+                ),
 
-                  SizedBox(
-                    width: size.width * 0.8,
-                    height: size.height * 0.02,
-                    child: Consumer<NowPlayingProvider>(
-                      builder: (context, value, child) {
-                        return Text(
-                          artistHelper(
-                              widget.songModelList[value.currentIndex].artist
-                                  .toString(),
-                              ''),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          style: TextStyle(
-                              fontFamily: 'rounder',
-                              fontSize: size.height * 0.0165,
-                              overflow: TextOverflow.ellipsis,
-                              fontWeight: FontWeight.normal,
-                              color: Theme.of(context)
-                                  .unselectedWidgetColor
-                                  .withOpacity(.5)),
-                        );
-                      },
-                    ),
-                  ),
+                SizedBox(
+                  height: size.height * 0.02,
+                ),
 
-                  // Progress Bar Here
-                  Padding(
-                    padding: EdgeInsets.only(
-                      top: size.height * 0.03,
-                      bottom: size.height * 0.01,
-                      left: size.width * 0.01,
-                      right: size.width * 0.01,
-                    ),
-                    child: SizedBox(
-                      width: size.width * 0.9,
-                      height: size.height * 0.060,
-                      child: Consumer<NowPlayingProvider>(
-                        builder: (context, value, child) {
-                          return MozSlider(
-                              currentPosition: value.position,
-                              totalDuration: value.duration,
-                              onChanged: (newValue) {
-                                value.changeToSeconds(
-                                    newValue * value.duration.inSeconds);
+                SizedBox(
+                    height: size.height * 0.11,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        // Shuffle Button here
+                        Consumer<NowPlayingProvider>(
+                            builder: (context, value, child) {
+                          return InkWell(
+                              onTap: () {
+                                bottomDetailsSheet(
+                                  song: widget.songModelList,
+                                  index: value.currentIndex,
+                                  isPlaylistShown: true,
+                                  onTap: () {
+                                    DialogueUtils.getDialogue(context, 'peasy',
+                                        arguments: widget.songModelList);
+                                  },
+                                  context: context,
+                                );
                               },
-                              sliderColor: Colors.deepPurple[400]!,
-                              thumbColor: Colors.deepPurple[400]!,
-                              backgroundColor:
-                                  Colors.deepPurple[400]!.withOpacity(.1));
+                              child: Icon(
+                                Icons.more_vert_rounded,
+                                size: size.width * 0.07,
+                                color: const Color(0xff9CADC0),
+                              ));
+                        }),
+
+                        StreamBuilder<LoopMode>(
+                          stream: MozController.player.loopModeStream,
+                          builder: (context, snapshot) {
+                            return repeatButton(context,
+                                snapshot.data ?? LoopMode.off, size.width);
+                          },
+                        ),
+
+                        Consumer<NowPlayingProvider>(
+                          builder: (context, value, child) {
+                            return FavButMusicPlaying(
+                                songFavoriteMusicPlaying:
+                                    widget.songModelList[value.currentIndex]);
+                          },
+                        ),
+
+                        InkWell(
+                            radius: 50,
+                            overlayColor:
+                                WidgetStateProperty.all(Colors.transparent),
+                            onTap: () {
+                              DialogueUtils.getDialogue(context, 'speed',
+                                  arguments: isDark
+                                      ? Colors.transparent
+                                      : Colors.black.withOpacity(.3));
+                            },
+                            child: SetSvg(
+                              name: GetAsset.speed,
+                              width: size.width * .07,
+                              height: size.height * .03,
+                              color: MozController.player.speed != 1.0
+                                  ? Colors.deepPurple[400]!
+                                  : const Color(0xff9CADC0),
+                            )),
+                      ],
+                    )),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      //Skip TO Previous Song
+                      StreamBuilder<bool>(
+                        stream: MozController.player.shuffleModeEnabledStream,
+                        builder: (context, snapshot) {
+                          bool isEnabled = snapshot.data ?? false;
+                          return shuffleButton(context, isEnabled, size.width);
                         },
                       ),
-                    ),
+                      // DefaultShuffleOrder()
+                      nextPrevoiusIcons(
+                        context,
+                        () {
+                          context
+                              .read<NowPlayingProvider>()
+                              .previousButtonHere();
+                        },
+                        GetAsset.previous,
+                      ),
+
+                      StreamBuilder<PlayerState>(
+                        stream: MozController.player.playerStateStream,
+                        builder: (_, snapshot) {
+                          return SizedBox(
+                              height: size.height * 0.13,
+                              width: size.width * 0.13,
+                              child: playPauseButton(context,
+                                  MozController.player.playing, size, isDark));
+                        },
+                      ),
+
+                      nextPrevoiusIcons(
+                        context,
+                        () async {
+                          context.read<NowPlayingProvider>().nextButtonHere();
+                        },
+                        GetAsset.next,
+                      ),
+                      homeButton(context, size.width),
+                    ],
                   ),
-
-                  SizedBox(
-                    height: size.height * 0.02,
-                  ),
-
-                  SizedBox(
-                      height: size.height * 0.11,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          // Shuffle Button here
-                          Consumer<NowPlayingProvider>(
-                              builder: (context, value, child) {
-                            return InkWell(
-                                onTap: () {
-                                  bottomDetailsSheet(
-                                    song: widget.songModelList,
-                                    index: value.currentIndex,
-                                    isPlaylistShown: true,
-                                    onTap: () {
-                                      DialogueUtils.getDialogue(
-                                          context, 'peasy',
-                                          arguments: widget.songModelList);
-                                    },
-                                    context: context,
-                                  );
-                                },
-                                child: Icon(
-                                  Icons.more_vert_rounded,
-                                  size: size.width * 0.07,
-                                  color: const Color(0xff9CADC0),
-                                ));
-                          }),
-
-                          StreamBuilder<LoopMode>(
-                            stream: MozController.player.loopModeStream,
-                            builder: (context, snapshot) {
-                              return repeatButton(context,
-                                  snapshot.data ?? LoopMode.off, size.width);
-                            },
-                          ),
-
-                          Consumer<NowPlayingProvider>(
-                            builder: (context, value, child) {
-                              return FavButMusicPlaying(
-                                  songFavoriteMusicPlaying:
-                                      widget.songModelList[value.currentIndex]);
-                            },
-                          ),
-
-                          InkWell(
-                              radius: 50,
-                              overlayColor:
-                                  WidgetStateProperty.all(Colors.transparent),
-                              onTap: () {
-                                DialogueUtils.getDialogue(context, 'speed',
-                                    arguments: isDark
-                                        ? Colors.transparent
-                                        : Colors.black.withOpacity(.3));
-                              },
-                              child: SetSvg(
-                                name: GetAsset.speed,
-                                width: size.width * .07,
-                                height: size.height * .03,
-                                color: MozController.player.speed != 1.0
-                                    ? Colors.deepPurple[400]!
-                                    : const Color(0xff9CADC0),
-                              )),
-                        ],
-                      )),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        //Skip TO Previous Song
-                        StreamBuilder<bool>(
-                          stream: MozController.player.shuffleModeEnabledStream,
-                          builder: (context, snapshot) {
-                            bool isEnabled = snapshot.data ?? false;
-                            return shuffleButton(
-                                context, isEnabled, size.width);
-                          },
-                        ),
-
-                        nextPrevoiusIcons(
-                          context,
-                          () {
-                            context
-                                .read<NowPlayingProvider>()
-                                .previousButtonHere();
-                          },
-                          GetAsset.previous,
-                        ),
-
-                        StreamBuilder<PlayerState>(
-                          stream: MozController.player.playerStateStream,
-                          builder: (_, snapshot) {
-                            return SizedBox(
-                                height: size.height * 0.13,
-                                width: size.width * 0.13,
-                                child: playPauseButton(
-                                    context, MozController.player.playing, size,isDark));
-                          },
-                        ),
-
-                        nextPrevoiusIcons(
-                          context,
-                          () async {
-                            context.read<NowPlayingProvider>().nextButtonHere();
-                          },
-                          GetAsset.next,
-                        ),
-                        homeButton(context, size.width),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+                )
+              ],
             ),
           ),
         ),

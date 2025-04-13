@@ -17,6 +17,14 @@ class CustomThemes {
       backgroundColor: Colors.grey[300],
       
     ),
+  //    switchTheme: SwitchThemeData(
+  //   thumbColor: WidgetStateProperty.all(Colors.white), 
+  //   trackColor: WidgetStateProperty.all(Colors.grey.withOpacity(0.5)), 
+  //   trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
+  //   trackOutlineWidth: WidgetStateProperty.all(0), 
+ 
+  //   splashRadius: 20, 
+  // ),
     unselectedWidgetColor: const Color(0xff333c67),
     secondaryHeaderColor: const Color(0xffD0D2E7),
     focusColor: const Color.fromARGB(255, 225, 213, 244),
@@ -59,6 +67,13 @@ class CustomThemes {
     appBarTheme: const AppBarTheme(
       backgroundColor: Color(0xff1F1F1F),
     ),
+  //   switchTheme: SwitchThemeData(
+  //   thumbColor: WidgetStateProperty.all(Colors.white), 
+  //   trackColor: WidgetStateProperty.all(Colors.grey.withOpacity(0.5)),
+  //   trackOutlineColor: WidgetStateProperty.all(Colors.transparent), 
+  //   trackOutlineWidth: WidgetStateProperty.all(0),
+  //   splashRadius: 20,
+  // ),
   );
   //greem Color.fromARGB(255, 2, 212, 65),
   //blue  Color.fromARGB(255, 2, 75, 212),

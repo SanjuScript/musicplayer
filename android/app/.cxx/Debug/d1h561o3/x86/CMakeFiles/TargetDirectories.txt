@@ -1,0 +1,2 @@
+C:/Users/npsan/Documents/moz-music/android/app/.cxx/Debug/d1h561o3/x86/CMakeFiles/edit_cache.dir
+C:/Users/npsan/Documents/moz-music/android/app/.cxx/Debug/d1h561o3/x86/CMakeFiles/rebuild_cache.dir

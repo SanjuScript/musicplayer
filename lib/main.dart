@@ -1,14 +1,17 @@
 import 'dart:developer';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:flutter/services.dart';
 import 'package:music_player/ANIMATION/up_animation.dart';
+import 'package:music_player/CONTROLLER/handler.dart';
 import 'package:music_player/DATABASE/favorite_db.dart';
 import 'package:music_player/DATABASE/playlistDb.dart';
 import 'package:music_player/DATABASE/recently_played.dart';
+import 'package:music_player/DATABASE/remove_songs_db.dart';
 import 'package:music_player/MODEL/song_play_count.dart';
 // import 'package:music_player/HELPER/audio_handler.dart';
 import 'package:music_player/Model/music_model.dart';
@@ -25,13 +28,13 @@ import 'package:music_player/PROVIDER/now_playing_provider.dart';
 import 'package:music_player/PROVIDER/remove_song_provider.dart';
 import 'package:music_player/PROVIDER/sleep_timer_provider.dart';
 import 'package:music_player/PROVIDER/theme_class_provider.dart';
-import 'package:music_player/SCREENS/settings/about.dart';
 import 'package:music_player/SCREENS/const_splashScreen.dart';
 import 'package:music_player/SCREENS/playlist/playList_song_listpage.dart';
 import 'package:music_player/SCREENS/playlist/playlistSong_display_screen.dart';
-import 'package:music_player/SCREENS/settings/privacy_policy.dart';
 import 'package:music_player/SCREENS/song_info.dart';
 import 'package:music_player/SCREENS/splash_screen.dart';
+import 'package:music_player/screens/settings/about.dart';
+import 'package:music_player/screens/settings/privacy_policy.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'COLORS/colors.dart';
@@ -53,11 +56,13 @@ Future<void> main() async {
   await Hive.openBox<int>('RecentDB');
   await Hive.openBox('MostPlayedDB');
   await Hive.openBox<int>('FavoriteDB');
+  await Hive.openBox<int>('removedDB');
   await Hive.openBox('songsBox');
   await Hive.openBox<MusicModel>('playlistDB');
 
   FavoriteDb.favoriteSongs;
   RecentDb.recentSongs;
+  RemovedSongsDB.removedSongs;
   await PlayListDB.getAllPlaylist();
 
   SystemChrome.setSystemUIOverlayStyle(
@@ -68,7 +73,20 @@ Future<void> main() async {
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
-  // await initAudioService();
+  // // await initAudioService();
+  //  final audioHandler = await AudioService.init(
+  //   builder: () => MozAudioHandler(),
+  //   config: const AudioServiceConfig(
+  //     androidNotificationChannelId: 'com.example.music.audio',
+  //     androidNotificationChannelName: 'Music Playback',
+  //     androidNotificationOngoing: true,
+  //     androidShowNotificationBadge: true,
+  //     preloadArtwork: true,
+  //     artDownscaleHeight: 100,
+  //     artDownscaleWidth: 100,
+  //     androidStopForegroundOnPause: true,
+  //   ),
+  // );
   await JustAudioBackground.init(
       androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
       androidNotificationChannelName: 'Moz Audio playback',
@@ -112,6 +130,7 @@ class MyApp extends StatelessWidget {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return MaterialApp(
+          // key: ValueKey<String>(themeProvider.currentTheme),
           home: isViewed != 0
               ? const OneTimeSplashScreen()
               : const SplashScreen(),
@@ -137,14 +156,14 @@ class MyApp extends StatelessWidget {
             '/about': (context) => const AboutPage(),
             '/privacyPage': (context) => const PrivacyPolicyPage(),
           },
-            onGenerateRoute: (settings) {
-        if (settings.name == '/playlistSongList') {
-          return Uptransition(const PlayListSongListScreen()); 
-        } else if (settings.name == '/playlistsong') {
-          return Uptransition(const PlaylistSongDisplayScreen()); 
-        }
-        return null;
-      },
+          onGenerateRoute: (settings) {
+            if (settings.name == '/playlistSongList') {
+              return Uptransition(const PlayListSongListScreen());
+            } else if (settings.name == '/playlistsong') {
+              return Uptransition(const PlaylistSongDisplayScreen());
+            }
+            return null;
+          },
         );
       },
     );

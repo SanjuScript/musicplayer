@@ -196,6 +196,7 @@ class _MostlyShotDisplayState extends State<MostlyShotDisplay> {
                         await MozController.player.setAudioSource(
                             await MozController.createSongList(_mostlyPlayedSongs),
                             initialIndex: crtindex);
+                            
                         await MozController.player.play();
                       
                         MozController.player.playerStateStream.listen((playerState) {

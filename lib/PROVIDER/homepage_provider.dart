@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:music_player/DATABASE/remove_songs_db.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,16 +12,14 @@ class HomePageSongProvider extends ChangeNotifier {
   List<SongModel> foundSongs = [];
   late List<SongModel> allSongs;
   List<SongModel> recentSongs = [];
-  List<SongModel> removedSongsList = [];
   bool _permissionGranted = false;
   Future<List<SongModel>>? _songsFuture;
   SortOption _defaultSort = SortOption.adate;
-  Set<int> _removedSongs = {};
+
   int _currentSongCount = 0;
 
   int get currentSongCount => _currentSongCount;
 
-  Set<int> get removedSongs => _removedSongs;
 
   bool get permissionGranted => _permissionGranted;
   Future<List<SongModel>>? get songsFuture => _songsFuture;
@@ -33,32 +32,24 @@ class HomePageSongProvider extends ChangeNotifier {
   void removeSongs(List<SongModel> songsToRemove) {
     for (var song in songsToRemove) {
       homePageSongs.remove(song);
-      _removedSongs.add(song.id);
-      removedSongsList.add(song); // Add to removed songs list
+      RemovedSongsDB.add(song);
     }
-    saveRemovedSongs(); // Save the updated removed songs list
-    notifyListeners(); // Notify listeners of the state change
-  }
-void restoreAllSongs() {
-  for (var song in removedSongsList) {
-    _removedSongs.remove(song.id);
-    homePageSongs.add(song);
-  }
-  removedSongsList.clear();
-  saveRemovedSongs();
-  notifyListeners();
-}
-
-    void restoreSong(SongModel song) {
-    removedSongsList.remove(song);
-    _removedSongs.remove(song.id);
-    homePageSongs.add(song);
-    saveRemovedSongs(); // Save the updated removed songs list
     notifyListeners();
   }
 
-  List<SongModel> getRemovedSongs() {
-    return removedSongsList;
+  void restoreAllSongs() {
+    for (var song in RemovedSongsDB.removedSongs.value) {
+      homePageSongs.add(song);
+    }
+    RemovedSongsDB.clear();
+    notifyListeners();
+  }
+
+  void restoreSong(SongModel song) {
+    homePageSongs.add(song);
+    RemovedSongsDB.remove(song);
+
+    notifyListeners();
   }
 
   void filterSongs(String enteredKeyword) {
@@ -95,7 +86,6 @@ void restoreAllSongs() {
     }
   }
 
-
   void fetchAllSongs() async {
     allSongs = await OnAudioQuery().querySongs(
       sortType: SongSortType.DATE_ADDED,
@@ -103,11 +93,13 @@ void restoreAllSongs() {
       uriType: UriType.EXTERNAL,
       ignoreCase: null,
     );
-
     // Filter out unwanted songs
     foundSongs = allSongs.where((song) {
       final displayName = song.displayName.toLowerCase();
-      return !_removedSongs.contains(song.id) && // Exclude removed songs
+                final removedIds = RemovedSongsDB.musicDb.values.toSet();
+
+
+      return !removedIds.contains(song.id) && // Exclude removed songs
           !displayName.contains(".opus") &&
           !displayName.contains("aud") &&
           !displayName.contains("recordings") &&
@@ -121,28 +113,7 @@ void restoreAllSongs() {
     notifyListeners();
   }
 
-  Future<void> saveRemovedSongs() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(
-      'removed_songs',
-      _removedSongs.map((id) => id.toString()).toList(),
-    );
-  }
-
-  Future<void> loadRemovedSongs() async {
-    final prefs = await SharedPreferences.getInstance();
-    final removedSongIds = prefs.getStringList('removed_songs') ?? [];
-    _removedSongs = removedSongIds.map(int.parse).toSet();
-
-    // Load the removed songs from the song query
-    removedSongsList =
-        allSongs.where((song) => _removedSongs.contains(song.id)).toList();
-    homePageSongs =
-        allSongs.where((song) => !_removedSongs.contains(song.id)).toList();
-
-    notifyListeners();
-  }
-
+ 
   List<SongModel> getLastAddedSongs(int count) {
     final effectiveCount = count.clamp(0, homePageSongs.length);
     final sonrted = sortSongs(homePageSongs, SortOption.adate);
@@ -163,8 +134,13 @@ void restoreAllSongs() {
     final filteredSongs = songs.where((song) {
       final displayName = song.displayName.toLowerCase();
       final songDur = (song.duration! / 1000) >= 10;
+      // final removedIds = RemovedSongsDB.removedSongsList
+      //     .map((removedSong) => removedSong.id)
+      //     .toSet();
+          final removedIds = RemovedSongsDB.musicDb.values.toSet();
+          
 
-      return !_removedSongs.contains(song.id) && // Exclude removed songs
+      return !removedIds.contains(song.id) && // Exclude removed songs
           !displayName.contains(".opus") &&
           !displayName.contains("aud") &&
           !displayName.contains("ptt".toUpperCase()) &&
@@ -177,7 +153,6 @@ void restoreAllSongs() {
           !displayName.contains("whatsapp") &&
           songDur;
     }).toList();
-
     homePageSongs = filteredSongs;
     currentSongCount = filteredSongs.length;
 
@@ -206,7 +181,6 @@ void restoreAllSongs() {
   HomePageSongProvider() {
     // Call loadRemovedSongs asynchronously using a microtask
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await loadRemovedSongs();
       if (_permissionGranted) {
         _songsFuture = querySongs();
         notifyListeners();

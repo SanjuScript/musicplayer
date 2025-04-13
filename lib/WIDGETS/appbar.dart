@@ -40,14 +40,14 @@ class TopAppBar extends StatelessWidget {
               width: 15,
             ),
             InkWell(
-              overlayColor: MaterialStateProperty.all(Colors.transparent),
+              overlayColor: WidgetStateProperty.all(Colors.transparent),
               onTap: iconTap,
               child: Container(
                   height: MediaQuery.of(context).size.height * 0.07,
                   width: MediaQuery.of(context).size.height * 0.07,
                   margin: const EdgeInsets.symmetric(horizontal: 15),
                   decoration: BoxDecoration(
-                      color: Colors.red[400],
+                      color: Colors.deepPurple[400],
                       borderRadius: BorderRadius.circular(15)),
                   child: Icon(
                     icon,
@@ -126,7 +126,7 @@ class TopAppBar extends StatelessWidget {
                       : icon == Icons.music_note_rounded
                           ? Icons.play_circle_fill_rounded
                           : Icons.playlist_add_rounded,
-                  color: Colors.red[400],
+                  color: Colors.deepPurple[400],
                 )),
             Text(
               firstString,

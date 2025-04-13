@@ -34,6 +34,7 @@ void bottomDetailsSheet({
   void Function()? remove,
   bool enableRemoveButton = false,
   bool isPlaylistShown = false,
+  bool showNext = false,
 }) async {
   await showModalBottomSheet<void>(
     backgroundColor: Colors.transparent,
@@ -89,14 +90,14 @@ void bottomDetailsSheet({
                       icon: Icons.info_outline,
                     ),
                   ),
-                  InkWell(
-                    onTap: onTap,
-                    child: moreListTile(
-                      context: context,
-                      text: 'Add to Playlist',
-                      icon: Icons.playlist_add_rounded,
+                    InkWell(
+                      onTap: onTap,
+                      child: moreListTile(
+                        context: context,
+                        text: !isPlaylistShown && showNext ? 'Play Next':'Add to Playlist',
+                        icon: Icons.playlist_add_rounded,
+                      ),
                     ),
-                  ),
                   InkWell(
                     onTap: () {
                       final songPath = song[index].data;

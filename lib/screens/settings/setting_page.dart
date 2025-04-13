@@ -1,5 +1,5 @@
+import 'dart:developer';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -15,11 +15,17 @@ import 'package:music_player/PROVIDER/theme_class_provider.dart';
 import 'package:music_player/WIDGETS/dialogues/UTILS/dialogue_utils.dart';
 import 'package:music_player/WIDGETS/dialogues/reset_confirmation_dialogue.dart';
 import 'package:music_player/screens/removed_songs_ui.dart';
+import 'package:music_player/screens/settings/Helper/get_playback_values.dart';
+import 'package:music_player/screens/settings/Widgets/color_option.dart';
+import 'package:music_player/screens/settings/Widgets/custom_switch.dart';
+import 'package:music_player/screens/settings/Widgets/setting_item.dart';
 import 'package:music_player/screens/settings/appinfo.dart';
 import 'package:music_player/screens/settings/contact_support.dart';
 import 'package:music_player/screens/settings/privacy_policy.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+
+import 'Widgets/seting_selection.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -105,7 +111,7 @@ class _SettingsState extends State<Settings> {
                     left: 0,
                     right: 0,
                     child: Image.asset(
-                      'assets/logo.jpg', // Replace with your image URL or asset
+                      'assets/logo.jpg',
                       fit: BoxFit.cover,
                       height: 200.0,
                     ),
@@ -142,7 +148,7 @@ class _SettingsState extends State<Settings> {
                               builder: (context, snapshot) {
                                 final currentLoopMode =
                                     snapshot.data ?? LoopMode.off;
-                                return Switch(
+                                return CustomSwitch(
                                   value: currentLoopMode != LoopMode.off,
                                   onChanged: (value) async {
                                     final newLoopMode =
@@ -162,7 +168,7 @@ class _SettingsState extends State<Settings> {
                                   MozController.player.shuffleModeEnabledStream,
                               builder: (context, snapshot) {
                                 final isShuffle = snapshot.data ?? false;
-                                return Switch(
+                                return CustomSwitch(
                                   value: isShuffle,
                                   onChanged: (value) async {
                                     await MozController.player
@@ -188,7 +194,7 @@ class _SettingsState extends State<Settings> {
                                       Radius.circular(10)),
                                   style: TextStyle(
                                       color: Theme.of(context).cardColor),
-                                  value: _getPlaybackSpeedLabel(
+                                  value: GetPlayBackData.getPlaybackSpeedLabel(
                                       currentSpeed), // Use the current speed
                                   items: [
                                     'Normal',
@@ -205,7 +211,8 @@ class _SettingsState extends State<Settings> {
                                   }).toList(),
                                   onChanged: (value) {
                                     double speedValue =
-                                        _getPlaybackSpeedValue(value!);
+                                        GetPlayBackData.getPlaybackSpeedValue(
+                                            value!);
                                     if (MozController.player.playing) {
                                       MozController.player.setSpeed(speedValue);
                                     }
@@ -285,7 +292,7 @@ class _SettingsState extends State<Settings> {
                                   TextStyle(color: Theme.of(context).cardColor),
                               value: context
                                   .watch<ThemeProvider>()
-                                  .getDisplayThemeMode(), // Use the new method
+                                  .getDisplayThemeMode(),
                               items: const [
                                 DropdownMenuItem<String>(
                                   value: 'Light',
@@ -299,53 +306,82 @@ class _SettingsState extends State<Settings> {
                                   value: 'System Default',
                                   child: Text('System Default'),
                                 ),
+                                DropdownMenuItem<String>(
+                                  value: 'Time-Based',
+                                  child: Text('Time-Based'),
+                                ),
                               ],
                               onChanged: (value) {
                                 if (value == 'Light') {
                                   context.read<ThemeProvider>().setLightMode();
+                                  context
+                                      .read<ThemeProvider>()
+                                      .setTimeBasedMode(false);
                                 } else if (value == 'Dark') {
+                                  context
+                                      .read<ThemeProvider>()
+                                      .setTimeBasedMode(false);
                                   context.read<ThemeProvider>().setDarkMode();
                                 } else if (value == 'System Default') {
+                                  context
+                                      .read<ThemeProvider>()
+                                      .setTimeBasedMode(false);
                                   context.read<ThemeProvider>().setSystemMode();
+                                } else if (value == 'Time-Based') {
+                                  context
+                                      .read<ThemeProvider>()
+                                      .setTimeBasedMode(true);
                                 }
                               },
                             ),
                           ),
                           SettingsItem(
-                            title: 'Accent Color',
-                            trailing: const Icon(Icons.color_lens),
-                            onTap: () {
-                              if (!isDarkMode) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text(
-                                          'Switch to dark mode to use this')),
-                                );
-                                HapticFeedback.mediumImpact();
-                              } else {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text("Select Accent Color"),
-                                      content: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          buildColorOption(context, Colors.red),
-                                          buildColorOption(
-                                              context, Colors.green),
-                                          buildColorOption(
-                                              context, Colors.blue),
-                                          buildColorOption(
-                                              context, Colors.yellow),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                );
-                              }
-                            },
+                            title: 'Enable Time-Based Mode',
+                            trailing: CustomSwitch(
+                              value:
+                                  context.watch<ThemeProvider>().isTimeBased(),
+                              onChanged: (value) {
+                                context
+                                    .read<ThemeProvider>()
+                                    .setTimeBasedMode(value);
+                              },
+                            ),
                           ),
+                          // SettingsItem(
+                          //   title: 'Accent Color',
+                          //   trailing: const Icon(Icons.color_lens),
+                          //   onTap: () {
+                          //     if (!isDarkMode) {
+                          // ScaffoldMessenger.of(context).showSnackBar(
+                          //   const SnackBar(
+                          //       content: Text(
+                          //           'switch to dark mode to use this')),
+                          // );
+                          // HapticFeedback.mediumImpact();
+                          //     } else {
+                          //       showDialog(
+                          //         context: context,
+                          //         builder: (context) {
+                          //           return AlertDialog(
+                          //             title: const Text("Select Accent Color"),
+                          //             content: Column(
+                          //               mainAxisSize: MainAxisSize.min,
+                          //               children: [
+                          //                 buildColorOption(context, Colors.red),
+                          //                 buildColorOption(
+                          //                     context, Colors.green),
+                          //                 buildColorOption(
+                          //                     context, Colors.blue),
+                          //                 buildColorOption(
+                          //                     context, Colors.yellow),
+                          //               ],
+                          //             ),
+                          //           );
+                          //         },
+                          //       );
+                          //     }
+                          //   },
+                          // ),
                         ],
                       ),
                       // Notifications
@@ -354,19 +390,30 @@ class _SettingsState extends State<Settings> {
                         items: [
                           SettingsItem(
                             title: 'Play Notifications',
-                            trailing: Switch(
+                            trailing: CustomSwitch(
                               value: true,
                               onChanged: (value) {
-                                // Handle toggle
+                                HapticFeedback.mediumImpact();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Go to app setting to turn off')),
+                                );
                               },
                             ),
                           ),
                           SettingsItem(
                             title: 'Update Notifications',
-                            trailing: Switch(
-                              value: false,
+                            trailing: CustomSwitch(
+                              value: true,
                               onChanged: (value) {
-                                // Handle toggle
+                                HapticFeedback.mediumImpact();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content:
+                                        Text('Go to app setting to turn off'),
+                                  ),
+                                );
                               },
                             ),
                           ),
@@ -396,7 +443,7 @@ class _SettingsState extends State<Settings> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                         const RemovedSongsPage()));
+                                          const RemovedSongsPage()));
                             },
                           ),
                         ],
@@ -422,16 +469,16 @@ class _SettingsState extends State<Settings> {
                             title: 'FAQ',
                             trailing: const Icon(Icons.help_outline),
                             onTap: () {
-                              Navigator.push(
-                                  context, Uptransition(PrivacyPolicyPage()));
+                              Navigator.push(context,
+                                  Uptransition(const PrivacyPolicyPage()));
                             },
                           ),
                           SettingsItem(
                             title: 'Contact Support',
                             trailing: const Icon(Icons.contact_support),
                             onTap: () {
-                              Navigator.push(
-                                  context, Uptransition(ContactSupportPage()));
+                              Navigator.push(context,
+                                  Uptransition(const ContactSupportPage()));
                             },
                           ),
                           SettingsItem(
@@ -439,7 +486,7 @@ class _SettingsState extends State<Settings> {
                             trailing: const Icon(Icons.info_outline),
                             onTap: () {
                               Navigator.push(
-                                  context, Uptransition(AppInfoPage()));
+                                  context, Uptransition(const AppInfoPage()));
                             },
                           ),
                         ],
@@ -452,111 +499,6 @@ class _SettingsState extends State<Settings> {
           ),
         ],
       ),
-    );
-  }
-}
-
-Widget buildColorOption(BuildContext context, Color color) {
-  return ListTile(
-    leading: CircleAvatar(backgroundColor: color),
-    title: Text(
-      colorToString(color),
-      style: TextStyle(color: Theme.of(context).cardColor),
-    ),
-    onTap: () {
-      // Provider.of<ThemeProvider>(context, listen: false).setDarkModeWithAccent(color);
-      Navigator.pop(context); // Close dialog after selection
-    },
-  );
-}
-
-String colorToString(Color color) {
-  if (color == Colors.red) return 'Red';
-  if (color == Colors.green) return 'Green';
-  if (color == Colors.blue) return 'Blue';
-  if (color == Colors.yellow) return 'Yellow';
-  return 'Unknown';
-}
-
-String _getPlaybackSpeedLabel(double speed) {
-  switch (speed) {
-    case 0.5:
-      return '0.5x';
-    case 0.8:
-      return '0.8x';
-    case 1.0:
-      return '1.0x';
-    case 1.5:
-      return '1.5x';
-    case 2.0:
-      return '2.0x';
-    default:
-      return 'Normal';
-  }
-}
-
-double _getPlaybackSpeedValue(String label) {
-  switch (label) {
-    case '0.5x':
-      return 0.5;
-    case '0.8x':
-      return 0.8;
-    case '1.0x':
-      return 1.0;
-    case '1.5x':
-      return 1.5;
-    case '2.0x':
-      return 2.0;
-    default:
-      return 1.0;
-  }
-}
-
-class SettingsSection extends StatelessWidget {
-  final String title;
-  final List<SettingsItem> items;
-
-  const SettingsSection({super.key, required this.title, required this.items});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-              color: Theme.of(context).cardColor,
-              fontSize: 25,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'optica'),
-        ),
-        const Divider(),
-        ...items,
-      ],
-    );
-  }
-}
-
-class SettingsItem extends StatelessWidget {
-  final String title;
-  final Widget trailing;
-  final void Function()? onTap;
-
-  const SettingsItem(
-      {super.key, required this.title, required this.trailing, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(
-        title,
-        style: TextStyle(
-          color: Theme.of(context).cardColor.withOpacity(.8),
-        ),
-      ),
-      trailing: trailing,
-      onTap: onTap,
     );
   }
 }

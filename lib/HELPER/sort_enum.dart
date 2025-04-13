@@ -59,10 +59,10 @@ enum SortOption {
         songs.sort((a, b) => b.duration!.compareTo(a.duration!));
         break;
       case SortOption.adate:
-        songs.sort((a, b) => b.dateAdded!.compareTo(a.dateAdded!));
+        songs.sort((a, b) => b.dateModified!.compareTo(a.dateModified!));
         break;
       case SortOption.zdate:
-        songs.sort((a, b) => a.dateAdded!.compareTo(b.dateAdded!));
+        songs.sort((a, b) => a.dateModified!.compareTo(b.dateModified!));
         break;
       case SortOption.afileSize:
         songs.sort((a, b) => b.size.compareTo(a.size));

@@ -7,7 +7,7 @@ class ArtworkColorProvider extends ChangeNotifier {
   PaletteGenerator? _paletteGenerator;
   PaletteGenerator? get paletteGenerator => _paletteGenerator;
 
-  List<Color> _imageColors = [];
+  List<Color> _imageColors = [Colors.black, Colors.black];
   List<Color> get imageColors => _imageColors;
 
   Color _dominantColor = Colors.black;
@@ -23,20 +23,18 @@ class ArtworkColorProvider extends ChangeNotifier {
 
     _paletteGenerator = await PaletteGenerator.fromImageProvider(
       MemoryImage(artworkData),
-      size: const Size(250, 250),
+      size: const Size(500, 500),
       maximumColorCount: 20,
     );
 
     if (_paletteGenerator != null) {
       Color? dominantColor = _paletteGenerator!.dominantColor?.color;
+      List<Color>? colorList = _paletteGenerator!.colors.toList();
       if (dominantColor != null) {
-        // Calculate luminance
         double luminance = dominantColor.computeLuminance();
 
-        // Adjust opacity based on luminance
         double opacity = luminance > 0.5 ? 0.2 : 0.8;
-
-        // Apply opacity to the color
+        _imageColors = colorList;
         _dominantColor = dominantColor.withOpacity(opacity);
       } else {
         _dominantColor =
@@ -50,7 +48,7 @@ class ArtworkColorProvider extends ChangeNotifier {
   }
 
   Future<List<Color>> extractImageColors(List<Uint8List?> imageList) async {
-    // List<Color> colors = [];
+    List<Color> colors = [];
     for (Uint8List? imageData in imageList) {
       if (imageData != null) {
         PaletteGenerator palette = await PaletteGenerator.fromImageProvider(
@@ -58,9 +56,9 @@ class ArtworkColorProvider extends ChangeNotifier {
           size: const Size(250, 250),
           maximumColorCount: 20,
         );
-        _imageColors.addAll(palette.colors);
+        colors.addAll(palette.colors);
       }
     }
-    return _imageColors;
+    return colors;
   }
 }

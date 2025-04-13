@@ -158,10 +158,16 @@ class _PlaylistScreenState extends State<PlaylistScreen>
                                     text: data.name,
                                   )
                                 : PlaylistCreationBox(
-                                    artwork: AudioArtworkDefinerForOthers(
-                                        size: 500,
-                                        imgRadius: 6,
-                                        id: data.songId.last),
+                                    artwork: Material(
+                                      type: MaterialType.transparency,
+                                      child: Hero(
+                                        tag: data.songId.last,
+                                        child: AudioArtworkDefinerForOthers(
+                                            size: 500,
+                                            imgRadius: 6,
+                                            id: data.songId.last),
+                                      ),
+                                    ),
                                     songCount:
                                         "${data.songId.length.toString()} songs",
                                     isArtworkAvailable: true,

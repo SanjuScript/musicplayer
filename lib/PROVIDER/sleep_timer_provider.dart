@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:music_player/CONTROLLER/song_controllers.dart';
 
 class SleepTimeProvider extends ChangeNotifier {
@@ -10,6 +11,7 @@ class SleepTimeProvider extends ChangeNotifier {
   int get remainingTime => _remainingTime;
 
   void startTimer(int minute) {
+    
     if (_timer != null && _timer!.isActive) {
       _timer!.cancel();
     }
@@ -21,12 +23,31 @@ class SleepTimeProvider extends ChangeNotifier {
         notifyListeners();
       } else {
         stopTimer();
-       if(minute != 0){
-         MozController.player.stop();
-       }
+        if (minute != 0) {
+          MozController.player.stop();
+        }
       }
     });
     notifyListeners();
+  }
+
+  void stopAfterCurrentSong() {
+    _cancelTimers(); 
+
+    _isStart = true;
+
+    MozController.player.playerStateStream.listen((playerState) {
+      if (playerState.processingState == ProcessingState.completed) {
+        stopTimer();
+        MozController.player.stop();
+      }
+    });
+
+    notifyListeners();
+  }
+
+  void _cancelTimers() {
+    _timer?.cancel();
   }
 
   void stopTimer() {

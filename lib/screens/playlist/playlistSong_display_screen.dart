@@ -77,10 +77,16 @@ class _PlaylistSongDisplayScreenState extends State<PlaylistSongDisplayScreen>
                   Container(
                     height: MediaQuery.of(context).size.height * 0.30,
                     width: MediaQuery.of(context).size.width,
-                    child: AudioArtworkDefinerForOthers(
-                      id: playlistsong.isNotEmpty ? playlistsong.first.id : 0,
-                      size: 500,
-                      imgRadius: 0,
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: Hero(
+                        tag: playlistsong.last.id,
+                        child: AudioArtworkDefinerForOthers(
+                          id: playlistsong.isNotEmpty ? playlistsong.last.id : 0,
+                          size: 500,
+                          imgRadius: 0,
+                        ),
+                      ),
                     ),
                   ),
                   Container(
@@ -104,7 +110,7 @@ class _PlaylistSongDisplayScreenState extends State<PlaylistSongDisplayScreen>
                         20, // Adjust this value to position the text higher or lower
                     left: 20,
                     child: Text(
-                      "${playlist.songId.length} songs ",
+                     playlist.songId.length > 1 ? "${playlist.songId.length} songs " : "${playlist.songId.length} song ",
                       style: TextStyle(
                         letterSpacing: 1,
                         fontFamily: "appollo",

@@ -1,13 +1,14 @@
 // ignore_for_file: invalid_use_of_visible_for_testing_member
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:music_player/CONSTANTS/asset_helper.dart';
 import 'package:music_player/PROVIDER/bottom_nav_provider.dart';
 import 'package:music_player/SCREENS/mainUI/home_page.dart';
 import 'package:music_player/SCREENS/mainUI/most_played_songs.dart';
 import 'package:music_player/SCREENS/playlist/playlist_screen.dart';
 import 'package:music_player/PROVIDER/sleep_timer_provider.dart';
 import 'package:music_player/SCREENS/mainUI/recently_played.dart';
-import 'package:music_player/SCREENS/settings/setting.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:provider/provider.dart';
 import '../DATABASE/favorite_db.dart';
@@ -76,6 +77,7 @@ class _BottomNavState extends State<BottomNav> {
   @override
   Widget build(BuildContext context) {
     log('Bottom Nav rebuilded');
+    final size = MediaQuery.sizeOf(context);
     return WillPopScope(
       onWillPop: () async {
         if (selectedIndex != 0) {
@@ -189,21 +191,25 @@ class _BottomNavState extends State<BottomNav> {
                         // FavoriteDb.favoriteSongs.notifyListeners();
                       },
                       items: <BottomNavigationBarItem>[
-                        bottomNavBarMethod(
-                          bottomNavBarIcon: Icons.home,
+                        bottomNavBarMethodSvg(
+                          bottomNavBarIcon: GetAsset.home,
                           bottomNavBarLabel: 'Home',
+                          isSelected: provider.selectedIndex == 0,
                         ),
-                        bottomNavBarMethod(
-                          bottomNavBarIcon: Icons.library_music,
+                        bottomNavBarMethodSvg(
+                          bottomNavBarIcon: GetAsset.songs,
                           bottomNavBarLabel: 'Songs',
+                          isSelected: provider.selectedIndex == 1,
+                          size: size.width * 0.07,
                         ),
                         bottomNavBarMethod(
                           bottomNavBarIcon: Icons.favorite,
                           bottomNavBarLabel: 'Favorites',
                         ),
-                        bottomNavBarMethod(
-                          bottomNavBarIcon: Icons.queue_music,
+                        bottomNavBarMethodSvg(
+                          bottomNavBarIcon: GetAsset.playlist,
                           bottomNavBarLabel: 'Playlist',
+                          isSelected: provider.selectedIndex == 3,
                         ),
                         bottomNavBarMethod(
                           bottomNavBarIcon: Icons.music_note_outlined,
@@ -213,7 +219,6 @@ class _BottomNavState extends State<BottomNav> {
                           bottomNavBarIcon: Icons.play_lesson_rounded,
                           bottomNavBarLabel: 'Most played',
                         ),
-                       
                       ],
                     ),
                   ),
@@ -232,6 +237,27 @@ class _BottomNavState extends State<BottomNav> {
   }) {
     return BottomNavigationBarItem(
       icon: Icon(bottomNavBarIcon),
+      label: bottomNavBarLabel,
+    );
+  }
+
+  BottomNavigationBarItem bottomNavBarMethodSvg({
+    required String bottomNavBarIcon,
+    required String bottomNavBarLabel,
+    required bool isSelected,
+    double? size,
+  }) {
+    return BottomNavigationBarItem(
+      icon: SvgPicture.asset(
+        bottomNavBarIcon,
+        width: size ?? 24.0,
+        colorFilter: ColorFilter.mode(
+          isSelected
+              ? Colors.deepPurple[400]!
+              : const Color.fromARGB(255, 63, 63, 63),
+          BlendMode.srcIn,
+        ),
+      ),
       label: bottomNavBarLabel,
     );
   }

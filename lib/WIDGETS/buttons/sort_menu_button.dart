@@ -1,46 +1,79 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:music_player/EXTENSION/capitalizer.dart';
+import 'package:music_player/PROVIDER/theme_class_provider.dart';
 import '../../HELPER/sort_enum.dart';
 
-class SortOptionBottomSheet extends StatelessWidget {
+class SortOptionDialog extends StatelessWidget {
   final SortOption selectedOption;
   final ValueChanged<SortOption> onSelected;
 
-  const SortOptionBottomSheet({
-    Key? key,
+  const SortOptionDialog({
+    super.key,
     required this.selectedOption,
     required this.onSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+    return Dialog(
+      backgroundColor: Colors.white,
+      insetPadding: const EdgeInsets.all(20),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-            color: Theme.of(context).dialogBackgroundColor,
+            color: Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
+            borderRadius: BorderRadius.circular(15),
           ),
-          child: Scrollbar(
-            
-            interactive: true,
-            radius: const Radius.circular(20),
-            thickness: 5,
-            child: ListView.builder(
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: GridView.builder(
+              physics: NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(5),
+              shrinkWrap: true,
               itemCount: SortOption.values.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 3,
+              ),
               itemBuilder: (context, index) {
                 final option = SortOption.values[index];
                 final title = _getTitleForSortOption(option);
-                return ListTile(
-                  
-                  title: buildListTileTitle(context, option, title),
+
+                return GestureDetector(
                   onTap: () {
                     onSelected(option);
                     Navigator.pop(context);
                   },
+                  child: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: selectedOption == option
+                          ? Colors.deepPurple[400]
+                          : Theme.of(context).scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.3),
+                          blurRadius: 5,
+                          offset: const Offset(2, 2),
+                        ),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: FittedBox(
+                      child: Text(
+                        title.capitalize(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontFamily: 'rounder',
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).cardColor),
+                      ),
+                    ),
+                  ),
                 );
               },
             ),
@@ -73,33 +106,5 @@ class SortOptionBottomSheet extends StatelessWidget {
       case SortOption.zfileSize:
         return "Smallest File First";
     }
-  }
-
-  Widget buildListTileTitle(
-      BuildContext context, SortOption option, String title) {
-    final isSelected = selectedOption == option;
-    final textStyle = TextStyle(
-      letterSpacing: .6,
-      fontFamily: 'rounder',
-      color: isSelected ? Colors.deepPurple[300] : Theme.of(context).cardColor,
-      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-    );
-
-    return Row(
-      children: [
-        Radio<SortOption>(
-          value: option,
-          groupValue: selectedOption,
-          onChanged: (value) {
-            onSelected(value!);
-            Navigator.pop(context);
-          },
-        ),
-        Text(
-          title.toUpperCase(),
-          style: textStyle,
-        ),
-      ],
-    );
   }
 }

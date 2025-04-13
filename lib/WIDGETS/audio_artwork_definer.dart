@@ -8,6 +8,9 @@ import 'dart:typed_data';
 
 import 'package:provider/provider.dart';
 
+final GlobalKey<_AudioArtworkDefinerState> audioArtworkKey =
+    GlobalKey<_AudioArtworkDefinerState>();
+
 class AudioArtworkDefiner extends StatefulWidget {
   final int id;
   final int size;

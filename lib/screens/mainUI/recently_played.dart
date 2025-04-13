@@ -61,7 +61,9 @@ class _RecentlyPlayedState extends State<RecentlyPlayed>
                             () {
                               RecentDb.deleteAll();
                               Navigator.pop(context);
-                            },null,null
+                            },
+                            null,
+                            null
                           ],
                         );
                       }

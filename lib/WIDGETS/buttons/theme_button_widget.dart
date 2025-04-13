@@ -56,20 +56,21 @@ class _ChangeThemeButtonWidgetState extends State<ChangeThemeButtonWidget> {
         // inactiveTrackColor: Colors.grey[700],
       );
     } else {
-      // return IconButton(
-      //   icon: Icon(
-      //     darkTheme ? Icons.dark_mode : Icons.light_mode,
-      //     color: darkTheme ? Colors.black : Colors.white,
-      //   ),
-      //   onPressed: () => _toggleTheme(themeProvider),
-      // );
       return InkWell(
         onTap: () => _toggleTheme(themeProvider),
-        child: SetSvg(
-          name: !darkTheme ? GetAsset.light :GetAsset.dark,
-          color: darkTheme ? Colors.black : Colors.white,
-          width: size.width * .07,
-          height: size.height * .03,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.all(8.0),
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.transparent,
+          ),
+          child: SetSvg(
+            name: !darkTheme ? GetAsset.light : GetAsset.dark,
+            color: darkTheme ? Colors.black : Colors.white,
+            width: size.width * .07,
+            height: size.height * .03,
+          ),
         ),
       );
     }
